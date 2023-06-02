@@ -1,0 +1,42 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productpage-staging
+spec:
+  hosts:
+  - productpage.bookinfo.svc.cluster.local
+  # order is important!
+  http:
+  - name: productpage-staging
+    match:
+      - headers:
+          env: 
+            exact: "staging"
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        subset: green
+
+  - name: productpage
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        subset: green
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: productpage
+spec:
+  host: productpage.bookinfo.svc.cluster.local
+  subsets:
+  - name: green
+    labels:
+      app: productpage
+      bluegreen: green
+  - name: blue
+    labels:
+      app: productpage
+      bluegreen: blue

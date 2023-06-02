@@ -1,0 +1,23 @@
+
+controller:
+  image:
+    registry: docker.io
+    image: koolay/nginx-controller
+    tag: "v1.8.0"
+    digest: ""
+    pullPolicy: IfNotPresent
+
+  admissionWebhooks:
+    patch:
+      enabled: true
+      image:
+        registry: docker.io
+        image: koolay/kube-webhook-certgen
+        tag: v20230407
+        digest: ""
+        pullPolicy: IfNotPresent
+
+  podAnnotations:
+    sidecar.istio.io/inject: 'true'
+    traffic.sidecar.istio.io/includeInboundPorts: ""
+    traffic.sidecar.istio.io/excludeInboundPorts: "80,443"

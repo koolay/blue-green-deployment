@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+    # proxy_set_header Host $host
+    nginx.ingress.kubernetes.io/upstream-vhost: productpage.bookinfo.svc.cluster.local
+  name: bookinfo-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - bookinfo.local.dev
+      secretName: tls-secret-local
+  rules:
+  - host: bookinfo.local.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+        path: /
+        pathType: Prefix
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+    nginx.ingress.kubernetes.io/upstream-vhost: productpage.bookinfo.svc.cluster.local
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+          more_set_input_headers 'env: staging';
+  name: bookinfo-staging
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - bookinfo-staging.local.dev
+      secretName: tls-secret-local
+  rules:
+  - host: bookinfo-staging.local.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+        path: /
+        pathType: Prefix
